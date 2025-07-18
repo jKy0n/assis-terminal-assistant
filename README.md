@@ -1,6 +1,6 @@
-# Assis — Terminal Virtual Assistant 🧠🐚
+# assis — Terminal Virtual Assistant 🧠🐚
 
-**Assis** is a lightweight terminal-based virtual assistant designed to help with Linux system administration tasks using local AI models, semantic search (RAG), and friendly Zsh integration.
+**assis** is a lightweight terminal-based virtual assistant designed to help with Linux system administration tasks using local AI models, semantic search (RAG), and friendly Zsh integration.
 
 ## ✨ Features
 - 🧠 Powered by [`mistral:7b-instruct-v0.3-q4_K_M`] via [Ollama](https://ollama.com)
