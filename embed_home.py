@@ -22,8 +22,12 @@ EXCLUDE_DIRS = [
     "BraveSoftware",
     "chromium",
     "Code",
-    "teams-for-linux",
+    "Code - OSS",
+    "GitHub Desktop",
+    "obsidian",
+    "Rambox",''
     "rambox",
+    "teams-for-linux",
 ]
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
