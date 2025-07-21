@@ -13,7 +13,7 @@ BATCH_SIZE = 256
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
 chroma_client = chromadb.HttpClient(host="localhost", port=8000)
-collection = client.get_or_create_collection(
+collection = chroma_client.get_or_create_collection(
   name="assis-docs",
   metadata={
     "hnsw:num_threads": 6,
