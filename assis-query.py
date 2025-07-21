@@ -50,12 +50,21 @@ docs = results.get("documents", [[]])[0]
 sources = results.get("metadatas", [[]])[0]
 scores = results.get("distances", [[]])[0]
 
-SIMILARITY_THRESHOLD = 0.35  # ajuste conforme necessário
+SIMILARITY_THRESHOLD = 0.8  # ou 1.0 para testar
+
 context = ""
 for i, (doc, meta, dist) in enumerate(zip(docs, sources, scores)):
     if dist <= SIMILARITY_THRESHOLD:
         origem = meta.get("source", "desconhecido")
         context += f"### Origem: {origem}\n{doc}\n\n"
+
+# Fallback para caso nada relevante entre
+if not context.strip() and docs:
+    i_best = scores.index(min(scores))
+    doc, meta = docs[i_best], sources[i_best]
+    origem = meta.get("source", "desconhecido")
+    context += f"### Origem: {origem}\n{doc}\n\n"
+
 context += extra_context
 
 if context.strip():
