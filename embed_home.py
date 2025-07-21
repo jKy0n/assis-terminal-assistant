@@ -35,7 +35,7 @@ chroma_client = chromadb.HttpClient(host="localhost", port=8000)
 collection = client.get_or_create_collection(
   name="assis-docs",
   metadata={
-    "hnsw:num_threads": 6,
+    "hnsw:num_threads": 8,
     "hnsw:construction_ef": 128,
     "hnsw:search_ef": 64
   }
