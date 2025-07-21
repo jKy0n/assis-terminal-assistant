@@ -19,6 +19,7 @@ EXCLUDE_DIRS = [
     ".mozilla",
     ".npm",
     ".steam",
+    "baloo",
     "BraveSoftware",
     "chromium",
     "Code",
@@ -28,11 +29,12 @@ EXCLUDE_DIRS = [
     "Rambox",''
     "rambox",
     "teams-for-linux",
+    "Trash",
 ]
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
 chroma_client = chromadb.HttpClient(host="localhost", port=8000)
-collection = client.get_or_create_collection(
+collection = chroma_client.get_or_create_collection(
   name="assis-docs",
   metadata={
     "hnsw:num_threads": 8,
@@ -88,7 +90,7 @@ print("🔄 Indexando /home ...")
 # Include directories and files
 INCLUDE_DIRS = [
     ".config",
-    ".local/share",
+    # ".local/share",
     ".bashrc",
     ".zshrc",
     ".profile",

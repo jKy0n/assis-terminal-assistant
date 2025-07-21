@@ -1,16 +1,17 @@
-import sys
+import argparse
 import chromadb
 from chromadb.utils import embedding_functions
 from sentence_transformers import SentenceTransformer
+import shutil
 import subprocess
+import sys
 import threading
 import time
-import shutil
-import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("query", nargs="*", help="Pergunta para o assistente")
 parser.add_argument("--file", help="Arquivo para incluir no contexto")
+parser.add_argument("--type", choices=["config", "manpage", "home"], help="Filtrar resultados por tipo de documento")
 args = parser.parse_args()
 
 query = " ".join(args.query)
@@ -32,28 +33,32 @@ collection = chroma_client.get_or_create_collection(name="assis-docs")
 
 # Usa modelo de embedding local
 model = SentenceTransformer("all-MiniLM-L6-v2")
-
-# Faz embedding da pergunta
 query_embedding = model.encode(query).tolist()
 
-# Busca semântica
-results = collection.query(
-    query_embeddings=[query_embedding],
-    n_results=4
-)
+# Prepara query com filtro por tipo e include distances
+query_params = {
+    "query_embeddings": [query_embedding],
+    "n_results": 8,
+    "include": ["documents", "metadatas", "distances"]
+}
+if args.type:
+    query_params["where"] = {"type": args.type}
 
-# Verifica se encontrou contexto
+results = collection.query(**query_params)
+
 docs = results.get("documents", [[]])[0]
 sources = results.get("metadatas", [[]])[0]
+scores = results.get("distances", [[]])[0]
 
-if docs or extra_context:
-    context = ""
-    if docs:
-        for i, doc in enumerate(docs):
-            origem = sources[i].get("source", "desconhecido")
-            context += f"### Origem: {origem}\n{doc}\n\n"
-    context += extra_context
+SIMILARITY_THRESHOLD = 0.35  # ajuste conforme necessário
+context = ""
+for i, (doc, meta, dist) in enumerate(zip(docs, sources, scores)):
+    if dist <= SIMILARITY_THRESHOLD:
+        origem = meta.get("source", "desconhecido")
+        context += f"### Origem: {origem}\n{doc}\n\n"
+context += extra_context
 
+if context.strip():
     prompt = f"""Você é o Assis, um assistente virtual especializado em Linux.
 Baseie sua resposta nas informações abaixo:
 
@@ -63,7 +68,7 @@ Agora responda à pergunta:
 {query}
 """
 else:
-    print("⚠️ Nenhum contexto encontrado. Usando conhecimento interno do modelo.\n")
+    print("⚠️ Nenhum contexto relevante encontrado. Usando conhecimento interno do modelo.\n")
     prompt = query
 
 # Spinner de carregamento
